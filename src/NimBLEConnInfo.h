@@ -12,10 +12,11 @@ friend class NimBLEClient;
 friend class NimBLECharacteristic;
 friend class NimBLEDescriptor;
 
+// <MS>
+public:
     ble_gap_conn_desc m_desc;
     NimBLEConnInfo()                       { m_desc = {}; }
     NimBLEConnInfo(ble_gap_conn_desc desc) { m_desc = desc; }
-public:
     /** @brief Gets the over-the-air address of the connected peer */
     NimBLEAddress    getAddress()          { return NimBLEAddress(m_desc.peer_ota_addr); }
 
