@@ -172,7 +172,8 @@ class NimBLEServerCallbacks {
      * @brief Called when a client requests a passkey for pairing (display).
      * @return The passkey to be sent to the client.
      */
-    virtual uint32_t onPassKeyDisplay();
+    // <MS>
+    virtual uint32_t onPassKeyDisplay(uint16_t connHandle);
 
     /**
      * @brief Called when using numeric comparision for pairing.

@@ -566,7 +566,8 @@ int NimBLEServer::handleGapEvent(ble_gap_event* event, void* arg) {
                 // if the (static)passkey is the default, check the callback for custom value
                 // both values default to the same.
                 if (pkey.passkey == 123456) {
-                    pkey.passkey = pServer->m_pServerCallbacks->onPassKeyDisplay();
+                    // <MS>
+                    pkey.passkey = pServer->m_pServerCallbacks->onPassKeyDisplay(event->passkey.conn_handle);
                 }
                 rc = ble_sm_inject_io(event->passkey.conn_handle, &pkey);
                 NIMBLE_LOGD(LOG_TAG, "BLE_SM_IOACT_DISP; ble_sm_inject_io result: %d", rc);
@@ -997,7 +998,8 @@ void NimBLEServerCallbacks::onMTUChange(uint16_t MTU, NimBLEConnInfo& connInfo) 
     NIMBLE_LOGD("NimBLEServerCallbacks", "onMTUChange(): Default");
 } // onMTUChange
 
-uint32_t NimBLEServerCallbacks::onPassKeyDisplay() {
+// <MS>
+uint32_t NimBLEServerCallbacks::onPassKeyDisplay(uint16_t connHandle) {
     NIMBLE_LOGD("NimBLEServerCallbacks", "onPassKeyDisplay: default: 123456");
     return 123456;
 } // onPassKeyDisplay
