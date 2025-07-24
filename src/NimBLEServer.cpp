@@ -354,6 +354,7 @@ int NimBLEServer::handleGapEvent(ble_gap_event* event, void* arg) {
 
     switch (event->type) {
         case BLE_GAP_EVENT_CONNECT: {
+            NIMBLE_LOGI(LOG_TAG, "handleGapEvent - BLE_GAP_EVENT_CONNECT");
             rc = event->connect.status;
             if (rc == BLE_ERR_UNSUPP_REM_FEATURE) {
                 rc = 0; // Workaround: Ignore unsupported remote feature error as it is not a real error.
@@ -369,6 +370,7 @@ int NimBLEServer::handleGapEvent(ble_gap_event* event, void* arg) {
             } else {
                 rc = ble_gap_conn_find(event->connect.conn_handle, &peerInfo.m_desc);
                 if (rc != 0) {
+                    NIMBLE_LOGI(LOG_TAG, "handleGapEvent - BLE_GAP_EVENT_CONNECT conn_handle (%hu) not found!", event->connect.conn_handle);
                     return 0;
                 }
 
@@ -386,6 +388,7 @@ int NimBLEServer::handleGapEvent(ble_gap_event* event, void* arg) {
         } // BLE_GAP_EVENT_CONNECT
 
         case BLE_GAP_EVENT_DISCONNECT: {
+            NIMBLE_LOGI(LOG_TAG, "handleGapEvent - BLE_GAP_EVENT_DISCONNECT");
             // If Host reset tell the device now before returning to prevent
             // any errors caused by calling host functions before resync.
             switch (event->disconnect.reason) {
@@ -430,7 +433,7 @@ int NimBLEServer::handleGapEvent(ble_gap_event* event, void* arg) {
 
         case BLE_GAP_EVENT_SUBSCRIBE: {
             NIMBLE_LOGI(LOG_TAG,
-                        "subscribe event; attr_handle=%d, subscribed: %s",
+                        "BLE_GAP_EVENT_SUBSCRIBE attr_handle=%d, subscribed: %s",
                         event->subscribe.attr_handle,
                         ((event->subscribe.cur_notify || event->subscribe.cur_indicate) ? "true" : "false"));
 
@@ -511,6 +514,7 @@ int NimBLEServer::handleGapEvent(ble_gap_event* event, void* arg) {
         } // BLE_GAP_EVENT_CONN_UPDATE
 
         case BLE_GAP_EVENT_REPEAT_PAIRING: {
+            NIMBLE_LOGE(LOG_TAG, "handleGapEvent - BLE_GAP_EVENT_REPEAT_PAIRING");
             /* We already have a bond with the peer, but it is attempting to
              * establish a new secure link.  This app sacrifices security for
              * convenience: just throw away the old bond and accept the new link.
@@ -531,6 +535,7 @@ int NimBLEServer::handleGapEvent(ble_gap_event* event, void* arg) {
         } // BLE_GAP_EVENT_REPEAT_PAIRING
 
         case BLE_GAP_EVENT_ENC_CHANGE: {
+            NIMBLE_LOGI(LOG_TAG, "handleGapEvent - BLE_GAP_EVENT_ENC_CHANGE");
             rc = ble_gap_conn_find(event->enc_change.conn_handle, &peerInfo.m_desc);
             if (rc != 0) {
                 return BLE_ATT_ERR_INVALID_HANDLE;
@@ -546,6 +551,8 @@ int NimBLEServer::handleGapEvent(ble_gap_event* event, void* arg) {
         } // BLE_GAP_EVENT_ENC_CHANGE
 
         case BLE_GAP_EVENT_IDENTITY_RESOLVED: {
+            NIMBLE_LOGI(LOG_TAG, "handleGapEvent - BLE_GAP_EVENT_IDENTITY_RESOLVED, conn_handle=%hu",
+                        event->identity_resolved.conn_handle);
             rc = ble_gap_conn_find(event->identity_resolved.conn_handle, &peerInfo.m_desc);
             if (rc != 0) {
                 return BLE_ATT_ERR_INVALID_HANDLE;
@@ -607,6 +614,7 @@ int NimBLEServer::handleGapEvent(ble_gap_event* event, void* arg) {
         } // BLE_GAP_EVENT_PASSKEY_ACTION
 
         default:
+            NIMBLE_LOGW(LOG_TAG, "handleGapEvent, unhandled: %s", NimBLEUtils::gapEventToString(event->type));
             break;
     }
 
