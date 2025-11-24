@@ -75,3 +75,19 @@ idf_component_register(
     ${ESP_NIMBLE_PRIV_REQUIRES}
 )
 
+# Various compiler warnings enabled
+target_compile_options(${COMPONENT_LIB} PRIVATE
+    -Wall
+    -Wextra
+    -Wformat
+    -Wformat=2
+#    -Wshadow
+#    -Wconversion
+#    -Wsign-conversion
+    -Wpointer-arith
+#    -Wcast-qual
+    -Wmissing-declarations
+#    -Wmissing-prototypes   # only C, not C++
+#    -Wstrict-prototypes    # only C, not C++
+)
+
