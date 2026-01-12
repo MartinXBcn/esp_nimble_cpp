@@ -18,6 +18,13 @@
 #ifndef NIMBLE_CPP_UTILS_H_
 #define NIMBLE_CPP_UTILS_H_
 
+
+// <MS>
+// Define the version of esp_nimble_cpp used for compilation 2.3.4
+#define MS_ESP_NIMBLE_CPP_VERSION_INT 002003004
+#define MS_ESP_NIMBLE_CPP_VERSION "2.3.4"
+
+
 #include "syscfg/syscfg.h"
 #if CONFIG_BT_NIMBLE_ENABLED
 
