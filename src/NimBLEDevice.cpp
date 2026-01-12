@@ -1303,10 +1303,11 @@ bool NimBLEDevice::setDeviceName(const std::string& deviceName) {
 /**
  * @brief Set a custom callback for gap events.
  * @param [in] handler The function to call when gap events occur.
+ * @param [in] arg Argument to pass to the handler.
  * @returns
  */
-bool NimBLEDevice::setCustomGapHandler(gap_event_handler handler) {
-    int rc = ble_gap_event_listener_register(&m_listener, handler, NULL);
+bool NimBLEDevice::setCustomGapHandler(gap_event_handler handler, void* arg) {
+    int rc = ble_gap_event_listener_register(&m_listener, handler, arg);
     if (rc == BLE_HS_EALREADY) {
         NIMBLE_LOGI(LOG_TAG, "Already listening to GAP events.");
         return true;
@@ -1325,7 +1326,7 @@ std::string NimBLEDevice::toString() {
     return getAddress().toString();
 } // toString
 
-# if CONFIG_NIMBLE_CPP_DEBUG_ASSERT_ENABLED || __DOXYGEN__
+# if MYNEWT_VAL(NIMBLE_CPP_DEBUG_ASSERT_ENABLED) || __DOXYGEN__
 /**
  * @brief Debug assert - weak function.
  * @param [in] file The file where the assert occurred.
@@ -1336,7 +1337,7 @@ void nimble_cpp_assert(const char* file, unsigned line) {
     ble_npl_time_delay(10);
     abort();
 }
-# endif // CONFIG_NIMBLE_CPP_DEBUG_ASSERT_ENABLED
+# endif // MYNEWT_VAL(NIMBLE_CPP_DEBUG_ASSERT_ENABLED)
 
 void NimBLEDevice::setDeviceCallbacks(NimBLEDeviceCallbacks* cb) {
     m_pDeviceCallbacks = cb ? cb : &defaultDeviceCallbacks;

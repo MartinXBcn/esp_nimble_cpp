@@ -123,12 +123,21 @@ int NimBLEScan::handleGapEvent(ble_gap_event* event, void* arg) {
                 NIMBLE_LOGI(LOG_TAG, "New advertiser: %s", advertisedAddress.toString().c_str());
             } else {
                 advertisedDevice->update(event, event_type);
-                if (isLegacyAdv && event_type == BLE_HCI_ADV_RPT_EVTYPE_SCAN_RSP) {
-                    NIMBLE_LOGI(LOG_TAG, "Scan response from: %s", advertisedAddress.toString().c_str());
-                } else {
-                    NIMBLE_LOGI(LOG_TAG, "Duplicate; updated: %s", advertisedAddress.toString().c_str());
+                if (isLegacyAdv) {
+                    if (event_type == BLE_HCI_ADV_RPT_EVTYPE_SCAN_RSP) {
+                        NIMBLE_LOGI(LOG_TAG, "Scan response from: %s", advertisedAddress.toString().c_str());
+                    } else {
+                        NIMBLE_LOGI(LOG_TAG, "Duplicate; updated: %s", advertisedAddress.toString().c_str());
+                    }
                 }
             }
+
+# if MYNEWT_VAL(BLE_EXT_ADV)
+            if (advertisedDevice->getDataStatus() == BLE_GAP_EXT_ADV_DATA_STATUS_INCOMPLETE) {
+                NIMBLE_LOGD(LOG_TAG, "EXT ADV data incomplete, waiting for more");
+                return 0;
+            }
+# endif
 
             if (!advertisedDevice->m_callbackSent) {
                 advertisedDevice->m_callbackSent++;
@@ -495,7 +504,7 @@ void NimBLEScan::clearResults() {
  * @brief Dump the scan results to the log.
  */
 void NimBLEScanResults::dump() const {
-# if CONFIG_NIMBLE_CPP_LOG_LEVEL >= 3
+# if MYNEWT_VAL(NIMBLE_CPP_LOG_LEVEL) >= 3
     for (const auto& dev : m_deviceVec) {
         NIMBLE_LOGI(LOG_TAG, "- %s", dev->toString().c_str());
     }
