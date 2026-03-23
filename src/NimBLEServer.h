@@ -61,7 +61,7 @@ class NimBLEClient;
  */
 class NimBLEServer {
   public:
-    void    start();
+    bool    start();
     uint8_t getConnectedCount() const;
     bool    disconnect(uint16_t connHandle, uint8_t reason = BLE_ERR_REM_USER_CONN_TERM) const;
     bool    disconnect(const NimBLEConnInfo& connInfo, uint8_t reason = BLE_ERR_REM_USER_CONN_TERM) const;
@@ -84,6 +84,7 @@ class NimBLEServer {
     void                  setDataLen(uint16_t connHandle, uint16_t tx_octets) const;
     bool                  updatePhy(uint16_t connHandle, uint8_t txPhysMask, uint8_t rxPhysMask, uint16_t phyOptions);
     bool                  getPhy(uint16_t connHandle, uint8_t* txPhy, uint8_t* rxPhy);
+    void                  serviceChanged();
 
 # if MYNEWT_VAL(BLE_ROLE_CENTRAL)
     NimBLEClient* getClient(uint16_t connHandle);
@@ -119,15 +120,15 @@ class NimBLEServer {
 
     NimBLEServer();
     ~NimBLEServer();
-    static int handleGapEvent(struct ble_gap_event* event, void* arg);
-    static int handleGattEvent(uint16_t connHandle, uint16_t attrHandle, ble_gatt_access_ctxt* ctxt, void* arg);
-    void       serviceChanged();
-    void       resetGATT();
+    static int  handleGapEvent(struct ble_gap_event* event, void* arg);
+    static int  handleGattEvent(uint16_t connHandle, uint16_t attrHandle, ble_gatt_access_ctxt* ctxt, void* arg);
+    static void gattRegisterCallback(struct ble_gatt_register_ctxt* ctxt, void* arg);
+    bool        resetGATT();
 
     bool m_gattsStarted : 1;
     bool m_svcChanged : 1;
     bool m_deleteCallbacks : 1;
-# if !MYNEWT_VAL(BLE_EXT_ADV)
+# if !MYNEWT_VAL(BLE_EXT_ADV) && MYNEWT_VAL(BLE_ROLE_BROADCASTER)
     bool m_advertiseOnDisconnect : 1;
 # endif
     NimBLEServerCallbacks*                                m_pServerCallbacks;
@@ -179,6 +180,15 @@ class NimBLEServerCallbacks {
      */
     // <MS>
     virtual uint32_t onPassKeyDisplay(uint16_t connHandle);
+
+    /**
+     * @brief Called when using passkey entry pairing and the peer requires the passkey to be entered.
+     * @param [in] connInfo A reference to a NimBLEConnInfo instance with information
+     * about the peer connection parameters.
+     * @details The application should call NimBLEDevice::injectPassKey with the passkey
+     * displayed on the peer device to complete the pairing process.
+     */
+    virtual void onPassKeyEntry(NimBLEConnInfo& connInfo);
 
     /**
      * @brief Called when using numeric comparision for pairing.
