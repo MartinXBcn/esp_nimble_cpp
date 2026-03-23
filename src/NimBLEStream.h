@@ -31,9 +31,9 @@
 # include <type_traits>
 # include <cstdarg>
 
-# if NIMBLE_CPP_ARDUINO_STRING_AVAILABLE
-#  include <Stream.h>
-# else
+#if NIMBLE_CPP_ARDUINO_STRING_AVAILABLE
+#include <Stream.h>
+#else
 
 // Minimal Stream/Print stubs when Arduino not available
 class Print {
@@ -58,7 +58,7 @@ class Stream : public Print {
   protected:
     unsigned long m_timeout{0};
 };
-# endif
+#endif
 
 class NimBLEStream : public Stream {
   public:
