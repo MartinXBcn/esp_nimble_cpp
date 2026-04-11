@@ -18,7 +18,6 @@
 #ifndef NIMBLE_CPP_UTILS_H_
 #define NIMBLE_CPP_UTILS_H_
 
-
 #include "syscfg/syscfg.h"
 #if CONFIG_BT_NIMBLE_ENABLED
 

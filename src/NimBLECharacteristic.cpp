@@ -18,7 +18,7 @@
 #include "NimBLECharacteristic.h"
 #if CONFIG_BT_NIMBLE_ENABLED && MYNEWT_VAL(BLE_ROLE_PERIPHERAL)
 
-# if defined(CONFIG_NIMBLE_CPP_IDF)
+# ifndef USING_NIMBLE_ARDUINO_HEADERS
 #  if !defined(ESP_IDF_VERSION_MAJOR) || ESP_IDF_VERSION_MAJOR < 5
 #   define ble_gatts_notify_custom   ble_gattc_notify_custom
 #   define ble_gatts_indicate_custom ble_gattc_indicate_custom
@@ -132,7 +132,7 @@ void NimBLECharacteristic::addDescriptor(NimBLEDescriptor* pDescriptor) {
     }
 
     pDescriptor->setCharacteristic(this);
-    NimBLEDevice::getServer()->serviceChanged();
+    NimBLEDevice::getServer()->setServiceChanged();
 }
 
 /**
@@ -159,7 +159,7 @@ void NimBLECharacteristic::removeDescriptor(NimBLEDescriptor* pDescriptor, bool 
     }
 
     pDescriptor->setRemoved(deleteDsc ? NIMBLE_ATT_REMOVE_DELETE : NIMBLE_ATT_REMOVE_HIDE);
-    NimBLEDevice::getServer()->serviceChanged();
+    NimBLEDevice::getServer()->setServiceChanged();
 } // removeDescriptor
 
 /**

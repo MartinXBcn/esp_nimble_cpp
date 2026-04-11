@@ -20,12 +20,12 @@
 
 # include "NimBLEDevice.h"
 # include "NimBLELog.h"
-# if defined(CONFIG_NIMBLE_CPP_IDF)
-#  include "os/os_mbuf.h"
-#  include "nimble/nimble_port.h"
-# else
+# ifdef USING_NIMBLE_ARDUINO_HEADERS
 #  include "nimble/porting/nimble/include/os/os_mbuf.h"
 #  include "nimble/porting/nimble/include/nimble/nimble_port.h"
+# else
+#  include "os/os_mbuf.h"
+#  include "nimble/nimble_port.h"
 # endif
 # include <algorithm>
 # include <cstdio>
@@ -215,8 +215,8 @@ struct NimBLEStream::ByteRingBuffer {
 };
 
 // Stub Print/Stream implementations when Arduino not available
-#if !NIMBLE_CPP_ARDUINO_STRING_AVAILABLE
-#include <cstring>
+# if !NIMBLE_CPP_ARDUINO_STRING_AVAILABLE
+#  include <cstring>
 
 size_t Print::print(const char* s) {
     if (!s) return 0;
@@ -262,7 +262,7 @@ size_t Print::printf(const char* fmt, ...) {
     free(buf);
     return ret;
 }
-#endif
+# endif
 
 /**
  * @brief Initialize the NimBLEStream, creating TX and RX buffers and setting up events.
