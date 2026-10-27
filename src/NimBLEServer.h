@@ -209,6 +209,13 @@ class NimBLEServerCallbacks {
     virtual void onAuthenticationComplete(NimBLEConnInfo& connInfo);
 
     /**
+     * @brief Decide whether an existing bond may be replaced by a new pairing.
+     * @return False to preserve the existing bond and ignore the pairing request.
+     * @note The default is true for compatibility. This callback runs before the old bond is deleted.
+     */
+    virtual bool onRepeatPairing(NimBLEConnInfo& connInfo);
+
+    /**
      * @brief Called when the peer identity address is resolved.
      * @param [in] connInfo A reference to a NimBLEConnInfo instance with information
      */

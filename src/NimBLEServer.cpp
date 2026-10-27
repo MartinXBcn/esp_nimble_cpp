@@ -624,14 +624,17 @@ int NimBLEServer::handleGapEvent(ble_gap_event* event, void* arg) {
 
         case BLE_GAP_EVENT_REPEAT_PAIRING: {
             NIMBLE_LOGE(LOG_TAG, "handleGapEvent - BLE_GAP_EVENT_REPEAT_PAIRING");
-            /* We already have a bond with the peer, but it is attempting to
-             * establish a new secure link.  This app sacrifices security for
-             * convenience: just throw away the old bond and accept the new link.
+            /* A bond already exists. Ask the application before replacing its
+             * key; the default callback retains the previous re-pairing behavior.
              */
 
             /* Delete the old bond. */
             rc = ble_gap_conn_find(event->repeat_pairing.conn_handle, &peerInfo.m_desc);
             if (rc != 0) {
+                return BLE_GAP_REPEAT_PAIRING_IGNORE;
+            }
+
+            if (!pServer->m_pServerCallbacks->onRepeatPairing(peerInfo)) {
                 return BLE_GAP_REPEAT_PAIRING_IGNORE;
             }
 
@@ -1226,6 +1229,10 @@ void NimBLEServerCallbacks::onIdentity(NimBLEConnInfo& connInfo) {
 void NimBLEServerCallbacks::onAuthenticationComplete(NimBLEConnInfo& connInfo) {
     NIMBLE_LOGD("NimBLEServerCallbacks", "onAuthenticationComplete: default");
 } // onAuthenticationComplete
+
+bool NimBLEServerCallbacks::onRepeatPairing(NimBLEConnInfo& connInfo) {
+    return true;
+} // onRepeatPairing
 
 void NimBLEServerCallbacks::onConnParamsUpdate(NimBLEConnInfo& connInfo) {
     NIMBLE_LOGD("NimBLEServerCallbacks", "onConnParamsUpdate: default");
